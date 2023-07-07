@@ -31,7 +31,7 @@ app.post("/api/image", upload.single("testImage"), async (req, res) => {
                 data: fs.readFileSync("uploads/" + req.file.filename),
                 contentType: "image/png",
             },
-            destination: req.body.destination,
+            image_details: req.body.image_details,
             size: req.body.size,
             tags: req.body.tags
         });

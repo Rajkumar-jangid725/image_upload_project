@@ -9,7 +9,7 @@ const imgSchema = new mongoose.Schema({
         data: Buffer,
         contentType: String
     },
-    description: String,
+    image_details: String,
     size: String,
     tags: String
 });
