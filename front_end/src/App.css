@@ -47,7 +47,6 @@ table {
   width: 100%;
 }
 
-.image-table th,
-.image-table td {
+.image-table tr {
   width: 100%;
 }

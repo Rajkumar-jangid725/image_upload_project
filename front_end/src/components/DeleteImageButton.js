@@ -6,8 +6,8 @@ const DeleteImageButton = ({ image }) => {
   };
 
   return (
-    <button onClick={handleDeleteImage} className ="mx-3">
-      Delete Image
+    <button onClick={handleDeleteImage} className="mx-3">
+      Delete
     </button>
   );
 };

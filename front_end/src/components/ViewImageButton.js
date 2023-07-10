@@ -7,7 +7,7 @@ const ViewImageButton = ({ image }) => {
 
   return (
     <button onClick={handleViewImage}>
-      View Image
+      View
     </button>
   );
 };

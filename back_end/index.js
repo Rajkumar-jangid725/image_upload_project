@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const cors = require("cors");
+const sharp = require('sharp');
 const port = 5000;
 const fs = require("fs");
 const imageModel = require("./models/image");
@@ -23,31 +24,66 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post("/api/image", upload.single("testImage"), async (req, res) => {
+const thumbnailsDir = "thumbnails";
+if (!fs.existsSync(thumbnailsDir)) {
+    fs.mkdirSync(thumbnailsDir);
+}
+
+const generateThumbnail = async (req, res, next) => {
     try {
-        const saveImage = imageModel({
-            name: req.body.name,
-            img: {
-                data: fs.readFileSync("uploads/" + req.file.filename),
-                contentType: "image/png",
-            },
-            image_details: req.body.image_details,
-            size: req.body.size,
-            tags: req.body.tags
-        });
-        await saveImage.save();
-        res.status(201).json({ message: "Image uploaded successfully!" });
-    }
-    catch (error) {
+        const { filename } = req.file;
+        const thumbnailPath = `thumbnails/${filename}`;
+
+        await sharp(`uploads/${filename}`)
+            .resize(100, 100)
+            .toFile(thumbnailPath);
+
+        req.thumbnailPath = thumbnailPath;
+        next();
+    } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Failed to upload image." });
+        res.status(500).json({ message: "Failed to generate thumbnail." });
+    }
+};
+
+app.post('/api/images', upload.single('testImage'), async (req, res) => {
+    try {
+        const { originalname, size, path } = req.file;
+        const { name, details, tags } = req.body;
+
+        const image = new imageModel({
+            name,
+            size,
+            details,
+            tags: tags.split(',').map((tag) => tag.trim()),
+            path,
+        });
+
+        await image.save();
+
+        res.status(201).json({ message: 'Image uploaded successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-app.get('/image', async (req, res) => {
-    const allData = await imageModel.find()
-    res.json(allData)
-})
+app.use('/thumbnails', express.static('thumbnails'));
+app.use('/images', express.static('uploads'));
+
+app.get("/", async (req, res) => {
+    try {
+        const allData = await imageModel.find({}, { _id: 0, image: 0 });
+        const dataWithThumbnails = allData.map((data) => ({
+            ...data._doc,
+            thumbnail: `http://localhost:${port}/${data.thumbnail}`
+        }));
+        res.json(dataWithThumbnails);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to fetch image data." });
+    }
+});
 
 app.listen(port, () => {
     console.log("server running successfully");

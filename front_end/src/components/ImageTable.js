@@ -8,16 +8,6 @@ const ImageTable = ({ images }) => {
     return (
         <>
             <table className="Image_Table">
-                {/* <thead>
-                    <tr>
-                        <th>Thumbnail</th>
-                        <th>Name</th>
-                        <th>Size</th>
-                        <th>Details</th>
-                        <th>Tags</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead> */}
                 <tbody>
                     {images.map((image) => (
                         <ImageTableRow key={image.id} image={image} />
