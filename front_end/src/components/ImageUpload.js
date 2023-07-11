@@ -1,59 +1,68 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Container, Button, ProgressBar, Alert, Form, FormControl } from 'react-bootstrap';
 
 function ImageUpload() {
-    // State variables for form data
-    const [thumbnail, setThumbnail] = useState('');
-    const [name, setName] = useState('');
-    const [size, setSize] = useState('');
-    const [tags, setTags] = useState('');
-    const [imageDetails, setImageDetails] = useState('');
+  const [testImage, setTestImage] = useState(null);
+  const [name, setName] = useState('');
+  const [size, setSize] = useState('');
+  const [tags, setTags] = useState('');
+  const [thumbnail, setThumbnail] = useState('');
+  const [image_details, setImage_details] = useState('');
+  const [progress, setProgress] = useState();
+  const [alertMessage, setAlertMessage] = useState('');
 
-    // Function to handle file input change
-    function handleImage(e) {
-        setThumbnail(e.target.files[0]);
-        setName(e.target.files[0].name);
-        setSize(e.target.files[0].size);
-        setTags(e.target.files[0].tags);
-        setImageDetails(e.target.files[0].imageDetails);
-    }
+  function handleImage(e) {
+    setTestImage(e.target.files[0])
+  }
 
-    // Function to handle API call
-    function handleApi() {
-        const formData = new FormData();
-        formData.append('thumbnail', thumbnail);
-        formData.append('name', name);
-        formData.append('size', size);
-        formData.append('image_details', imageDetails);
-        formData.append('tags', tags);
+  function handleApi() {
+    const formData = new FormData();
+    formData.append('testImage', testImage);
+    formData.append('name', name);
+    formData.append('size', size);
+    formData.append('tags', tags);
+    formData.append('thumbnails', thumbnail);
+    formData.append('image_details', image_details);
 
-        axios.post('http://localhost:5000/image_upload', formData)
-            .then((res) => {
-                console.log(res);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
-    function handleBackApi() {
-        //
-    }
-    // Render the component
-    return (
-        <div className='container'>
-            <br />
-            <div className='d-flex justify-content-end'><button className="mx-3" type="Back" onCLick={handleBackApi} >Back</button></div>
-            <div className='my-3'><input type="file" name='testImage' onChange={handleImage} /></div>
-            <div className='my-3'><input type="text" name='name' placeholder='Enter image name' onChange={(e) => setName(e.target.value)} /></div>
-            <div className='my-3'><input type="text" name='size' placeholder='Enter image size' onChange={(e) => setSize(e.target.value)} /></div>
-            <div className='my-3'> <input type="text" name='tags' placeholder='Enter image tags' onChange={(e) => setTags(e.target.value)} /></div>
-            <div className='my-3'><input type="text" name='thumbnails' placeholder='Enter image thumbnail name' onChange={(e) => setName(e.target.value)} /></div>
-            <div><textarea className="form-control" type="text" name='image_details' placeholder="Enter text here..." id="myBox" rows="8" onChange={(e) => setImageDetails(e.target.value)}></textarea></div>
-            <div className='my-3'><button onClick={handleApi}>Upload</button></div>
-        </div>
-    );
+    axios({
+      method: 'post',
+      url: 'http://localhost:5000/api/images',
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: data => {
+        setProgress(Math.round((100 * data.loaded) / data.total))
+      }
+    })
+      .then((res) => {
+        setAlertMessage('Image data uploaded successfully!')
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function handleBackApi() {
+    //
+  }
+
+  return (
+    <Container>
+      {alertMessage && <Alert variant="success" className="text-center my-3">{alertMessage}</Alert>}
+      <Button className="my-3" variant="primary" onClick={handleBackApi}>Back</Button>
+      <Form>
+        <FormControl className="my-3" type="file" name="testImage" onChange={handleImage} />
+        <FormControl className="my-3" type="text" name="name" placeholder="Enter image name" onChange={(e) => setName(e.target.value)} />
+        <FormControl className="my-3" type="text" name="size" placeholder="Enter image size" onChange={(e) => setSize(e.target.value)} />
+        <FormControl className="my-3" type="text" name="tags" placeholder="Enter image tags" onChange={(e) => setTags(e.target.value)} />
+        <FormControl className="my-3" type="text" name="thumbnails" placeholder="Enter image thumbnail name" onChange={(e) => setThumbnail(e.target.value)} />
+        <FormControl className="my-3" as="textarea" name="image_details" placeholder="Enter text here..." rows="8" onChange={(e) => setImage_details(e.target.value)} />
+      </Form>
+      <Button className="my-3" onClick={handleApi} variant="primary">Upload</Button>
+      {progress && <ProgressBar now={progress} label={`${progress}%`} />}
+    </Container>
+  );
 }
 
 export default ImageUpload;
-
-

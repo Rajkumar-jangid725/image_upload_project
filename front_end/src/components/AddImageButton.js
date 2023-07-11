@@ -5,7 +5,7 @@ const AddImageButton = () => {
         <div className="container">
             <h1 className="text-info" style={{ "marginLeft": "2%" }}>Images_with_Details</h1>
             <div className="d-flex justify-content-end">
-                <a className="btn btn-primary" href='http://localhost:5000/image_upload'>Add Image</a>
+                <a className="btn btn-primary" href='http://localhost:3000/image_upload'>Add Image</a>
             </div>
         </div>
 

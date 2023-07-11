@@ -46,27 +46,56 @@ const generateThumbnail = async (req, res, next) => {
     }
 };
 
-app.post('/api/images', upload.single('testImage'), async (req, res) => {
+app.post('/api/images', upload.single('testImage'), generateThumbnail, async (req, res) => {
     try {
-        const { originalname, size, path } = req.file;
-        const { name, details, tags } = req.body;
+        //const { originalname, size, path } = req.file;
+        const originalname = req.file.filename;
+        const size = req.file.size;
+        const path = req.file.path;
+
+        //const { name, image_details, tags, thumbnail } = req.body;
+        const name = req.file.filename;
+        const image_details = req.body.image_details;
+        const tags = req.body.tags;
+        const thumbnail = req.thumbnailPath;
 
         const image = new imageModel({
             name,
             size,
-            details,
+            image_details,
             tags: tags.split(',').map((tag) => tag.trim()),
             path,
+            thumbnail: req.thumbnailPath
         });
-
         await image.save();
-
         res.status(201).json({ message: 'Image uploaded successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+// app.post('/image_uploads', upload.single('testImage'), generateThumbnail, async (req, res) => {
+//     try {
+//         const { originalname, size, path } = req.file;
+//         const { name, image_details, tags, thumbnailPath } = req.body;
+//         const image = new imageModel({
+//             name,
+//             size,
+//             image_details,
+//             tags: tags.split(',').map((tag) => tag.trim()),
+//             path,
+//             thumbnail: req.thumbnailPath
+//         });
+
+//         await image.save();
+
+//         res.status(201).json({ message: 'Image uploaded successfully' });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
 
 app.use('/thumbnails', express.static('thumbnails'));
 app.use('/images', express.static('uploads'));
