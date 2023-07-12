@@ -2,19 +2,19 @@ import React from 'react';
 import ImageTableRow from './ImageTableRow';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
-
+import { Container, Table } from 'react-bootstrap';
 
 const ImageTable = ({ images }) => {
     return (
-        <>
-            <table className="Image_Table">
+        <Container>
+            <Table>
                 <tbody>
                     {images.map((image) => (
                         <ImageTableRow key={image.id} image={image} />
                     ))}
                 </tbody>
-            </table>
-        </>
+            </Table>
+        </Container>
     );
 };
 

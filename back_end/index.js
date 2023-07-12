@@ -68,41 +68,19 @@ app.post('/api/images', upload.single('testImage'), generateThumbnail, async (re
             thumbnail: req.thumbnailPath
         });
         await image.save();
-        res.status(201).json({ message: 'Image uploaded successfully' });
+        res.status(201).json({ message: 'Image uploaded successfully', id: image._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-// app.post('/image_uploads', upload.single('testImage'), generateThumbnail, async (req, res) => {
-//     try {
-//         const { originalname, size, path } = req.file;
-//         const { name, image_details, tags, thumbnailPath } = req.body;
-//         const image = new imageModel({
-//             name,
-//             size,
-//             image_details,
-//             tags: tags.split(',').map((tag) => tag.trim()),
-//             path,
-//             thumbnail: req.thumbnailPath
-//         });
-
-//         await image.save();
-
-//         res.status(201).json({ message: 'Image uploaded successfully' });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
-
 app.use('/thumbnails', express.static('thumbnails'));
 app.use('/images', express.static('uploads'));
 
 app.get("/", async (req, res) => {
     try {
-        const allData = await imageModel.find({}, { _id: 0, image: 0 });
+        const allData = await imageModel.find({}, { _id: 1, image: 0 });
         const dataWithThumbnails = allData.map((data) => ({
             ...data._doc,
             thumbnail: `http://localhost:${port}/${data.thumbnail}`
@@ -113,6 +91,36 @@ app.get("/", async (req, res) => {
         res.status(500).json({ message: "Failed to fetch image data." });
     }
 });
+
+app.get('/api/image/:name', (req, res) => {
+    const { name } = req.params;
+    res.sendFile(`${__dirname}/uploads/${name}`);
+});
+
+app.get("/image/:id", async (req, res) => {
+    try {
+        const _id = req.params.id;
+        const data = await imageModel.findById({ _id });
+        res.json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to fetch image data." });
+    }
+});
+
+app.delete("/image/:id", async (req, res) => {
+    try {
+        const _id = req.params.id;
+        const deleteData = await imageModel.findByIdAndDelete(_id);
+        if (!_id) {
+            return res.status(400).send()
+        }
+        res.send(deleteData);
+    }
+    catch (e) {
+        res.send(e);
+    }
+})
 
 app.listen(port, () => {
     console.log("server running successfully");

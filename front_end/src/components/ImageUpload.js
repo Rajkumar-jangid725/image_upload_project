@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Button, ProgressBar, Alert, Form, FormControl } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom'
 
 function ImageUpload() {
   const [testImage, setTestImage] = useState(null);
@@ -11,6 +12,7 @@ function ImageUpload() {
   const [image_details, setImage_details] = useState('');
   const [progress, setProgress] = useState();
   const [alertMessage, setAlertMessage] = useState('');
+  const navigate = useNavigate();
 
   function handleImage(e) {
     setTestImage(e.target.files[0])
@@ -43,14 +45,10 @@ function ImageUpload() {
       });
   }
 
-  function handleBackApi() {
-    //
-  }
-
   return (
     <Container>
       {alertMessage && <Alert variant="success" className="text-center my-3">{alertMessage}</Alert>}
-      <Button className="my-3" variant="primary" onClick={handleBackApi}>Back</Button>
+      <Button className="my-3" variant="primary" onClick={() => navigate(-1)}>Back</Button>
       <Form>
         <FormControl className="my-3" type="file" name="testImage" onChange={handleImage} />
         <FormControl className="my-3" type="text" name="name" placeholder="Enter image name" onChange={(e) => setName(e.target.value)} />

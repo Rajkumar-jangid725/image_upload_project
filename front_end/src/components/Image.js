@@ -13,7 +13,8 @@ const Image = () => {
                     image_details: image.image_details,
                     size: image.size,
                     tags: image.tags,
-                    thumbnail: image.thumbnail
+                    thumbnail: image.thumbnail,
+                    id: image._id
                 }));
                 setImages(imageData);
             })
