@@ -1,38 +1,13 @@
-// import React, { useState } from 'react';
-// import { Button } from 'react-bootstrap';
-// import axios from 'axios'
-
-// const DeleteImageButton = () => {
-//   const [images, setImages] = useState([]);
-
-//   const handleDelete = async (id) => {
-//     try {
-//       await axios.delete(`http://localhost:5000/image/${id}`);
-//       setImages(images.filter((image) => image.id !== id));
-//     } catch (error) {
-//       console.error('Error deleting image:', error);
-//     }
-//   };
-//   return (
-//     <Button variant="outline-danger" id={`${id}`} className="mx-1" onClick={() => handleDelete(id)}>Delete</Button>
-//   );
-// };
-
-
-// export default DeleteImageButton;
-
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
 
-const DeleteImageButton = ({ image, id }) => {
+const DeleteImageButton = ({ id }) => {
   const [images, setImages] = useState([]);
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/image/${id}`);
-      //console.log(images);
       setImages(images.filter((image) => image.id !== id));
-      //console.log(`After filter: ` + images)
     } catch (error) {
       console.error('Error deleting image:', error);
     }
@@ -52,7 +27,7 @@ const DeleteImageButton = ({ image, id }) => {
         setImages(imageData);
       })
       .catch((err) => console.log(err, "Error"));
-  }, []);
+  }, [images, id]);
 
   return (
     <Button variant="outline-danger" id={id} className="mx-1" onClick={() => handleDelete(id)}>
